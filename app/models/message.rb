@@ -1,5 +1,6 @@
 class Message < ApplicationRecord
-  belongs_to :chat
+  include Searchable
+  belongs_to :chat, counter_cache: true
 
   # Validations
   validates :body, presence: true

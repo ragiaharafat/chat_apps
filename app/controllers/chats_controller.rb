@@ -1,16 +1,18 @@
 class ChatsController < ApplicationController
   before_action :set_application
-  before_action :set_chat, only: %i[ show edit update destroy ]
+  #before_action :set_chat, only: %i[ show edit update destroy ]
 
   # GET /apps/:token/chats
   def index
     @chats = Chat.all
-    render json: @chats
+    render json: @chats.as_json(except: [:id])
   end
 
   # GET /chats/1 or /chats/1.json
   def show
-    render json: @chat
+    @app = App.find_by!(token: params[:app_id])
+    @chat = @app.chats.find_by!(id: params[:id])
+    render json: @chat.as_json(except: [:id])
   end
 
   def set_application
@@ -29,7 +31,17 @@ class ChatsController < ApplicationController
   # POST /chats or /chats.json
   def create
     @app = App.find_by!(token: params[:app_id])
-    @chat = @app.chats.new(chat_params)
+
+    chat_number = chat_params[:number]
+
+    existing_chat = @app.chats.find_by(number: chat_number)
+
+    if existing_chat
+      next_number = @app.chats.maximum(:number).to_i + 1
+      chat_number = next_number
+    end
+
+    @chat = @app.chats.new(number: chat_number)
 
     if @chat.save
       render json: @chat, status: :created

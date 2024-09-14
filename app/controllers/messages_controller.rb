@@ -1,19 +1,20 @@
 class MessagesController < ApplicationController
-  before_action :set_chat
   before_action :set_message, only: %i[ show edit update destroy ]
 
   # GET /messages or /messages.json
   def index
-    @messages = Message.all
-    render json: @messages
+    app = App.find_by!(token: params[:app_id])
+    chat = app.chats.find_by!(id: params[:chat_id]) 
+    @messages = chat.messages
+    render json: @messages.as_json(except: [:chat_id])
   end
 
   # GET /messages/1 or /messages/1.json
   def show
-    # @message = @chat.messages.find(params[:id])
-    # render json: @message
-    @chat = Chat.find(params[:chat_id])
-    @messages = @chat.messages
+    app = App.find_by!(token: params[:app_id])
+    chat = app.chats.find_by!(id: params[:chat_id]) 
+    @message = chat.messages.find(params[:id])
+    render json: @message
   end
 
   # POST /messages or /messages.json
@@ -57,12 +58,8 @@ class MessagesController < ApplicationController
       @message = Message.where(chat_id: params[:chat_id])
     end
 
-    def set_chat
-      @chat = Chat.find_by!(id: params[:number], app: App.find_by!(token: params[:app_id]))
-    end
-
     # Only allow a list of trusted parameters through.
     def message_params
-      params.permit(:body)
+      params.permit(:body, :chat_id)
     end
 end
