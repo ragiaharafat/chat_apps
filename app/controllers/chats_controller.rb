@@ -4,8 +4,7 @@ class ChatsController < ApplicationController
 
   # GET /apps/:token/chats
   def index
-    @chats = @app.chats.all
-    # @chats = Chat.where(app_id: @app.token)
+    @chats = Chat.all
     render json: @chats
   end
 
@@ -15,8 +14,7 @@ class ChatsController < ApplicationController
   end
 
   def set_application
-    puts token
-    @app = App.find_by!(token: params[:token])
+    @app = App.find_by!(token: params[:app_id])
   end
 
   # GET /chats/new
@@ -30,18 +28,13 @@ class ChatsController < ApplicationController
 
   # POST /chats or /chats.json
   def create
-    # @app = App.find(params[:app_id]) # Find the application by ID or token
+    @app = App.find_by!(token: params[:app_id])
     @chat = @app.chats.new(chat_params)
-    @chat.number = next_chat_number
 
-    respond_to do |format|
-      if @chat.save
-        format.html { redirect_to chat_url(@chat), notice: "Create chat was successfully created." }
-        format.json { render :show, status: :created, location: @chat }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @chat.errors, status: :unprocessable_entity }
-      end
+    if @chat.save
+      render json: @chat, status: :created
+    else
+      render json: @chat.errors, status: :unprocessable_entity
     end
   end
 
@@ -70,13 +63,9 @@ class ChatsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    # def set_chat
-    #   @chat = @app.chats.find(params[:chat_id])
-    # end
-
     # Only allow a list of trusted parameters through.
     def chat_params
-      params.require(:chat).permit(:chat_id, :number)
+      params.permit(:number)
     end
 
     def next_chat_number
