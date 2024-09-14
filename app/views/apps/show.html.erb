@@ -1,0 +1,11 @@
+<p style="color: green"><%= notice %></p>
+
+<% if @app %>
+  <%= render @app %>
+  <div>
+    <%= link_to "Edit this app", edit_app_path(@app) %> |
+    <%= link_to "Back", apps_path %>
+  </div>
+<% else %>
+  <p>App not found</p>
+<% end %>

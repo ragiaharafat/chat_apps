@@ -2,10 +2,10 @@
 
 one:
   number: 1
-  chat: one
-  body: MyText
+  application: one
+  messages_count: 1
 
 two:
   number: 1
-  chat: two
-  body: MyText
+  application: two
+  messages_count: 1

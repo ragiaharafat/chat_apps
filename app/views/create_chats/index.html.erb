@@ -1,0 +1,16 @@
+<p style="color: green"><%= notice %></p>
+
+<% content_for :title, "Create chats" %>
+
+<h1>Create chats</h1>
+
+<div id="create_chats">
+  <% @create_chats.each do |create_chat| %>
+    <%= render create_chat %>
+    <p>
+      <%= link_to "Show this create chat", create_chat %>
+    </p>
+  <% end %>
+</div>
+
+<%= link_to "New create chat", new_create_chat_path %>

@@ -1,0 +1,10 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @create_chat %>
+
+<div>
+  <%= link_to "Edit this create chat", edit_create_chat_path(@create_chat) %> |
+  <%= link_to "Back to create chats", create_chats_path %>
+
+  <%= button_to "Destroy this create chat", @create_chat, method: :delete %>
+</div>

@@ -27,6 +27,8 @@ gem "elasticsearch-rails"
 gem "sidekiq"
 gem "dotenv-rails", groups: [:development, :test]
 
+gem "selenium-webdriver"
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
@@ -64,5 +66,4 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
-  gem "selenium-webdriver"
 end

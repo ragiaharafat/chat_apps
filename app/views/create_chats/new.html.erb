@@ -1,0 +1,17 @@
+<!-- app/views/chats/new.html.erb -->
+<% content_for :title, "New Chat" %>
+
+<h1>New Chat</h1>
+
+<%= form_with(model: [@app, @chat], local: true) do |form| %>
+  <!-- No need for number field as it is auto-assigned -->
+  <div class="actions">
+    <%= form.submit 'Create Chat' %>
+  </div>
+<% end %>
+
+<br>
+
+<div>
+  <%= link_to "Back to Application", @app %>
+</div>
