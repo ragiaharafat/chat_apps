@@ -29,7 +29,7 @@ services:
   #   volumes:
   #     - es_data:/usr/share/elasticsearch/data
   redis:
-    image: redis:7.0.2-bullseye
+    image: redis:7.0.15
     command: redis-server
     volumes:
       - redis:/data
