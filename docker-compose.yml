@@ -5,10 +5,10 @@ services:
     image: mariadb:10.6
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: RAGIAH1234
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: chat_apps_v6_development
       MYSQL_USER: root
-      MYSQL_PASSWORD: RAGIAH1234
+      MYSQL_PASSWORD: root
     expose:
       - "3306"
     ports:
@@ -58,8 +58,6 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_URL: redis://redis:6379/0
-
-      # ELASTICSEARCH_URL: "http://elasticsearch:9200"
     depends_on:
       - "db"
       - "web"
@@ -72,7 +70,7 @@ services:
     working_dir: /chat_apps_v6
     environment:
       DB_USERNAME: root
-      DB_PASSWORD: "RAGIAH1234"
+      DB_PASSWORD: "root"
       DB_NAME: chat_apps_v6_development
       DB_PORT: 3306
       DB_HOST: db
@@ -86,8 +84,6 @@ services:
       - "3000:3000"
     depends_on:
       - db 
-        # condition: service_healthy
-      # - elasticsearch
     command: bash -c "bundle install && rails db:create db:migrate && rails server -b '0.0.0.0'"
 
 volumes:

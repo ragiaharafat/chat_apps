@@ -14,7 +14,7 @@ default: &default
   encoding: utf8mb4
   pool: 5
   username: root
-  password: RAGIAH1234
+  password: root
   socket: /var/run/mysqld/mysqld.sock
   host: db
   port: 3306
