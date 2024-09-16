@@ -24,7 +24,10 @@ gem "tzinfo-data"
 # Elastic search 
 gem "elasticsearch-model"
 gem "elasticsearch-rails"
-gem "sidekiq"
+gem 'sidekiq', "~>7.3.2"
+gem "redis", "~> 5.2"
+gem "redlock", "~> 2.0"
+
 gem "dotenv-rails", groups: [:development, :test]
 
 gem "selenium-webdriver"

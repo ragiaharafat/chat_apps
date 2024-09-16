@@ -5,14 +5,14 @@ class ChatsController < ApplicationController
   # GET /apps/:token/chats
   def index
     @chats = Chat.all
-    render json: @chats.as_json(except: [:id])
+    render json: @chats,  :except=> [:id, :app_id]
   end
 
   # GET /chats/1 or /chats/1.json
   def show
     @app = App.find_by!(token: params[:app_id])
     @chat = @app.chats.find_by!(id: params[:id])
-    render json: @chat.as_json(except: [:id])
+    render json: @chat,  :except=> [:id, :app_id]
   end
 
   def set_application
@@ -24,54 +24,19 @@ class ChatsController < ApplicationController
     @chat = @app.chats.build
   end
 
-  # GET /chats/1/edit
-  def edit
-  end
-
   # POST /chats or /chats.json
   def create
     @app = App.find_by!(token: params[:app_id])
 
-    chat_number = chat_params[:number]
+    chat_number = next_chat_number(@app.token)
 
-    existing_chat = @app.chats.find_by(number: chat_number)
+    $redis.set("#{params[:app_id]}_#{chat_number}_next_message_num", 1)
+    CreateChatJob.perform_async(params[:app_id], chat_number)
 
-    if existing_chat
-      next_number = @app.chats.maximum(:number).to_i + 1
-      chat_number = next_number
-    end
-
-    @chat = @app.chats.new(number: chat_number)
-
-    if @chat.save
-      render json: @chat, status: :created
-    else
-      render json: @chat.errors, status: :unprocessable_entity
-    end
+    render json: {number: chat_number, messages_count: 0}, status: :created
+    
   end
 
-  # PATCH/PUT /chats/1 or /chats/1.json
-  def update
-    respond_to do |format|
-      if @chat.update(chat_params)
-        format.html { redirect_to chat_url(@chat), notice: "Create chat was successfully updated." }
-        format.json { render :show, status: :ok, location: @chat }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @chat.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /chats/1 or /chats/1.json
-  def destroy
-    @chat.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to chats_url, notice: "Create chat was successfully destroyed." }
-      format.json { head :no_content }
-    end
-  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -80,7 +45,14 @@ class ChatsController < ApplicationController
       params.permit(:number)
     end
 
-    def next_chat_number
-      @app.chats.maximum(:number).to_i + 1
+    def next_chat_number(app_token)
+      redis_key = "#{app_token}_next_chat_number"
+      $redis_lock.lock(redis_key, 2000) do
+        current_number = $redis.get(redis_key).to_i
+        next_number = current_number + 1
+        $redis.set(redis_key, next_number)
+        puts "NEXT_NUMBER: #{next_number}"
+        return next_number
+      end
     end
 end

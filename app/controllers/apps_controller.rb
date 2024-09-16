@@ -1,5 +1,4 @@
 class AppsController < ApplicationController
-  # before_action :set_app, only: %i[ show edit update destroy ]
 
   # GET /apps or /apps.json
   def index
@@ -27,53 +26,15 @@ class AppsController < ApplicationController
 
   # POST /apps or /apps.json
   def create
-    @app = App.new(app_params)
-
-    # if @app
-    #   redirect_to @app, notice: 'Application already exsists'
-    # else
-    respond_to do |format|
-      if @app.save
-        format.html { redirect_to app_url(@app), notice: "App was successfully created." }
-        format.json { render :show, status: :created, location: @app }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @app.errors, status: :unprocessable_entity }
-      end
-      # end
-    end
+    Rails.logger.debug("App Params: #{app_params.inspect}")
+    CreateAppJob.perform_async(app_params[:token], app_params[:name])
+    render json: app_params[:name], status: :created
   end
+
+  private
 
   def app_params
     params.permit(:token,:name)
   end
-
-  # PATCH/PUT /apps/1 or /apps/1.json
-  def update
-    respond_to do |format|
-      if @app.update(app_params)
-        format.html { redirect_to app_url(@app), notice: "App was successfully updated." }
-        format.json { render :show, status: :ok, location: @app }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @app.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /apps/1 or /apps/1.json
-  def destroy
-    @app.destroy!
-
-    respond_to do |format|
-      format.html { redirect_to apps_url, notice: "App was successfully destroyed." }
-      format.json { head :no_content }
-    end
-  end
-
-  # private
-  #   # Use callbacks to share common setup or constraints between actions.
-  #   def set_app
-  #     @app = App.find_by(token: params[:token])
-  #   end
+  
 end
