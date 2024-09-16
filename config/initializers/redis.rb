@@ -1,21 +1,20 @@
 require 'redis'
-require 'redlock'
 
-# Default Redis URL
-default_redis_url = "redis://localhost:6379"
-
-# Initialize Redis client
-redis_url = ENV.fetch("REDIS_URL", default_redis_url)
 begin
-  $redis = Redis.new(url: redis_url)
+  redis_url = ENV.fetch("REDIS_URL") # Ensure REDIS_URL is provided
+  redis_config = { url: redis_url }
+  $redis = Redis.new(redis_config)
+rescue KeyError => e
+  puts "REDIS_URL is not set: #{e}"
 rescue Exception => e
-  puts "Redis client error: #{e.message}"
+  puts "Redis connection error: #{e}"
 end
 
-# Initialize Redlock client
-redis_lock_url = ENV.fetch("REDIS_URL", default_redis_url + "/1")
 begin
+  redis_lock_url = ENV.fetch("REDIS_URL")
   $redis_lock = Redlock::Client.new([redis_lock_url])
+rescue KeyError => e
+  puts "REDIS_URL for Redlock is not set: #{e}"
 rescue Exception => e
-  puts "Redlock client error: #{e.message}"
+  puts "Redlock initialization error: #{e}"
 end
