@@ -5,10 +5,10 @@ services:
     image: mariadb:10.6
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: RAGIAH1234
       MYSQL_DATABASE: chat_apps_v6_development
       MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_PASSWORD: RAGIAH1234
     expose:
       - "3306"
     ports:
@@ -34,7 +34,7 @@ services:
     volumes:
       - redis:/data
     ports:
-      - 6379
+      - "6379:6379"
     logging:
       driver: none
     healthcheck:
@@ -57,6 +57,8 @@ services:
       RAILS_ENV: development
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_URL: redis://redis:6379/0
+
       # ELASTICSEARCH_URL: "http://elasticsearch:9200"
     depends_on:
       - "db"
@@ -70,7 +72,7 @@ services:
     working_dir: /chat_apps_v6
     environment:
       DB_USERNAME: root
-      DB_PASSWORD: root
+      DB_PASSWORD: "RAGIAH1234"
       DB_NAME: chat_apps_v6_development
       DB_PORT: 3306
       DB_HOST: db

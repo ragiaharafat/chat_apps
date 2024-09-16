@@ -1,14 +1,21 @@
 require 'redis'
+require 'redlock'
 
-redis_config = { url: ENV.fetch("REDIS_URL") { "redis://localhost:6379" } }
+# Default Redis URL
+default_redis_url = "redis://localhost:6379"
+
+# Initialize Redis client
+redis_url = ENV.fetch("REDIS_URL", default_redis_url)
 begin
-  $redis = Redis.new(redis_config)
+  $redis = Redis.new(url: redis_url)
 rescue Exception => e
-  puts e
+  puts "Redis client error: #{e.message}"
 end
 
+# Initialize Redlock client
+redis_lock_url = ENV.fetch("REDIS_URL", default_redis_url + "/1")
 begin
-  $redis_lock = Redlock::Client.new([ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" }])
+  $redis_lock = Redlock::Client.new([redis_lock_url])
 rescue Exception => e
-  puts e
+  puts "Redlock client error: #{e.message}"
 end

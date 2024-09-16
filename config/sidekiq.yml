@@ -9,3 +9,5 @@ develop:
  - default
  - mailers
  - low
+:redis:
+  url: redis://redis:6379/0
