@@ -3,26 +3,35 @@ class MessagesController < ApplicationController
 
   # GET /messages or /messages.json
   def index
-    app = App.find_by!(token: params[:app_id])
-    chat = app.chats.find_by!(id: params[:chat_id]) 
-    @messages = chat.messages
-    render json: @messages, :except=> [:id, :chat_id], status: :created
+    @app = App.find_by!(token: params[:app_token])
+    @chat = @app.chats.find_by!(id: params[:chat_chat_id]) 
+    @messages = @chat.messages
+    render json: @messages, :except=> [:id, :chat_chat_id], status: :created
   end
 
   # GET /messages/1 or /messages/1.json
   def show
-    app = App.find_by!(token: params[:app_id])
-    chat = app.chats.find_by!(id: params[:chat_id]) 
-    @message = chat.messages.find(params[:id])
-    render json: @message, :except=> [:id, :chat_id], status: :created
+    @app = App.find_by!(token: params[:app_token])
+    @chat = @app.chats.find_by!(id: params[:chat_chat_id]) 
+    @message = @chat.messages.find(id: params[:id])
+    render json: @message, :except=> [:number, :chat_chat_id], status: :created
   end
 
   # POST /messages or /messages.json
   def create
-    @app = App.find_by!(token: params[:app_id])
-    next_mesg_num = next_message_number(params[:app_id], params[:chat_id])
-    CreateMessageJob.perform_async(params[:app_id], params[:chat_id], next_mesg_num, message_params[:body])
-    render json: {number: next_mesg_num, message: params[:body]}, :except=> [:id, :chat_id], status: :created
+    @app = App.find_by!(token: params[:app_token])
+    next_mesg_num = next_message_number(params[:app_token], params[:chat_chat_id])
+    puts "Before createing message"
+    CreateMessageJob.perform_async(params[:app_token], params[:chat_chat_id], next_mesg_num, message_params[:body])
+    render json: {number: next_mesg_num, message: params[:body]}, :except=> [:id, :chat_chat_id], status: :created
+  end
+
+  def destroy
+    if @message.destroy
+      render json: { message: 'Message deleted successfully' }, status: :ok
+    else
+      render json: { error: 'Failed to delete message' }, status: :unprocessable_entity
+    end
   end
 
   # def search
@@ -61,11 +70,11 @@ class MessagesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def message_params
-    params.permit(:body, :app_id ,:chat_id)
+    params.permit(:body, :app_token ,:chat_id)
   end
 
-  def next_message_number(app_id,chat_id)
-    redis_key = "#{app_id}_#{chat_id}_next_msg_num"
+  def next_message_number(app_token,chat_id)
+    redis_key = "#{app_token}_#{chat_id}_next_msg_num"
     $redis_lock.lock(redis_key, 2000) do
       current_number = $redis.get(redis_key).to_i
       next_number = current_number + 1

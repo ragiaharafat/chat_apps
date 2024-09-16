@@ -1,22 +1,29 @@
 class ChatsController < ApplicationController
-  before_action :set_application
+  # before_action :set_application
   #before_action :set_chat, only: %i[ show edit update destroy ]
 
   # GET /apps/:token/chats
   def index
-    @chats = Chat.all
-    render json: @chats,  :except=> [:id, :app_id]
+    @app = App.find_by("token": params[:app_token])
+    if @app.nil?
+      # Handle the case where the app is not found
+      render json: { error: 'App not found' }, status: :not_found
+    else
+      @chats = @app.chats # Get all chats for the found app
+      render json: @chats
+    end
   end
 
   # GET /chats/1 or /chats/1.json
   def show
-    @app = App.find_by!(token: params[:app_id])
-    @chat = @app.chats.find_by!(id: params[:id])
-    render json: @chat,  :except=> [:id, :app_id]
-  end
-
-  def set_application
-    @app = App.find_by!(token: params[:app_id])
+    @app = App.find_by("token": params[:app_token])
+    @chat = @app.chats.find_by!(id: params[:chat_id])
+    if @chat.nil?
+      Rails.logger.debug("Chat not found with ID: #{params[:chat_id]} in app with token: #{params[:app_token]}")
+      render json: { error: 'Chat not found' }, status: :not_found
+      return
+    end
+    render json: @chat
   end
 
   # GET /chats/new
@@ -26,15 +33,24 @@ class ChatsController < ApplicationController
 
   # POST /chats or /chats.json
   def create
-    @app = App.find_by!(token: params[:app_id])
+    @app = App.find_by!("token": params[:app_token])
 
     chat_number = next_chat_number(@app.token)
-
-    $redis.set("#{params[:app_id]}_#{chat_number}_next_message_num", 1)
-    CreateChatJob.perform_async(params[:app_id], chat_number)
+    $redis.set("#{params[:app_token]}_#{chat_number}_next_message_num", 1)
+    CreateChatJob.perform_async(params[:app_token], chat_number)
 
     render json: {number: chat_number, messages_count: 0}, status: :created
     
+  end
+
+  def destroy
+    @app = App.find_by!(token: params[:app_token])
+    chat = @app.chats.find_by!(id: params[:id])
+    if chat.destroy
+      render json: { message: 'Chat successfully deleted' }, status: :ok
+    else
+      render json: { error: 'Failed to delete chat' }, status: :unprocessable_entity
+    end
   end
 
 

@@ -8,11 +8,8 @@ class AppsController < ApplicationController
 
   # GET /apps/:token or /apps/:token.json
   def show
-    @app = App.find_by(token: params[:id])
-    if @app.nil?
-      flash[:alert] = "App not found"
-      redirect_to root_path
-    end
+    @app = App.find_by(token: params[:token])
+    render json: @app
   end
 
   # GET /apps/new
@@ -34,7 +31,7 @@ class AppsController < ApplicationController
   private
 
   def app_params
-    params.permit(:token,:name)
+    params.permit(:name)
   end
   
 end

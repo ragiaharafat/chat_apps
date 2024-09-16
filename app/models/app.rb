@@ -10,6 +10,7 @@ class App < ApplicationRecord
         random_token = Random.urlsafe_base64(nil, false)
         break random_token unless App.exists?(token: random_token)
         end
+        self.token=token
     end
 
 
