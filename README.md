@@ -51,69 +51,78 @@ This is a chat application built with Ruby on Rails, MariaDB, Redis, and Sidekiq
         - Create the application:
             ```
             POST  https://localhost:3000/apps/
-
-            ```json
+            json
                 {
                     {
                         name: "App Name"
                     }
-                }```
+                }
+            ```
             
         - Get all the applications: 
             ```
             GET https://localhost:3000/apps/
-        
+            ```
         - Get a specific application:
             ```
             GET https://localhost:3000/apps/{token}
+            ```
         
     * Chats:
         - Create a new chats:
             ```
             POST https://localhost:3000/apps/{token}/chats/
 
-            ```json
+            json
                 {
                     {
                         number: chat_number
                     }
-                }```
+                }
+            ```
         
         - Get all chats in a certain app:
             ```
             GET https://localhost:3000/apps/{token}/chats
+            ```
         
         - Get a specific chat in a certain app:
             ```
             GET https://localhost:3000/apps/{token}/chats/{id}
+            ```
         
         - Delete a certain app 
             ```
             DELETE https://localhost:3000/apps/{token}/chats/{id}
+            ```
 
     * Messages:
         - Send a message in a chat:
             ```
             POST https://localhost:3000/apps/{token}/chats/{id}/messages/
 
-             ```json
+            json
                 {
                     {
                         body: "Text"
                     }
-                }```
+                }
+            ```
 
         - Get the messages in a chat:
             ```
             GET https://localhost:3000/apps/{token}/chats/{id}/messages/
+            ```
 
         - Get a certain message in a chat
             ```
             GET https://localhost:3000/apps/{token}/chats/{id}/messages/{id}
+            ```
         
         - Delete messages
             ```
             DELETE https://localhost:3000/apps/{token}/chats/{id}/messages/
+            ```
 
 
     
