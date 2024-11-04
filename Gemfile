@@ -24,7 +24,7 @@ gem "tzinfo-data"
 # Elastic search 
 gem "elasticsearch-model"
 gem "elasticsearch-rails"
-gem 'sidekiq', "~>7.3.2"
+gem 'sidekiq', "~>7.3.5"
 gem "redis", "~> 5.2"
 gem "redlock", "~> 2.0"
 
